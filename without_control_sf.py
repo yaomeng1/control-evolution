@@ -12,7 +12,7 @@ import time
 b_list = np.arange(1, 2, 0.1)
 graph_scale = 30
 nodesnum = graph_scale ** 2
-m = 2
+m = 3
 
 
 
@@ -80,7 +80,8 @@ def evolution(state_dict, payoff_dict, game_matrix, edge_list, adj_dict):
         coord = np.sum(state_dict) / nodesnum
         freq_list.append(coord)
 
-    return np.mean(np.array(freq_list)[-2000:]).reshape(1, -1)
+    # return np.mean(np.array(freq_list)[-2000:]).reshape(1, -1)
+    return np.array(freq_list).reshape(1, -1)
 
 
 def process(b):
@@ -90,8 +91,8 @@ def process(b):
     game_matrix[1][0] = 0  # S
     game_matrix[1][1] = 1  # R
     net_list = []
-    net_rep = 10
-    repeat_time = 50
+    net_rep = 1
+    repeat_time = 1
     for _ in range(net_rep):
         repeat_list = []
         graph = nx.random_graphs.barabasi_albert_graph(nodesnum, m)
@@ -117,8 +118,9 @@ def process(b):
                 state_dict[idx_uncon] = 1
 
             repeat_list.append(evolution(state_dict, payoff_dict, game_matrix, edge_list, adj_dict))
-        net_list.append(np.concatenate(repeat_list, axis=1))
-    return np.concatenate(net_list, axis=0)
+            return repeat_list[0]
+    #     net_list.append(np.concatenate(repeat_list, axis=1))
+    # return np.concatenate(net_list, axis=0)
 
 
 if __name__ == "__main__":
@@ -139,10 +141,10 @@ if __name__ == "__main__":
     pool.join()
     t2 = time.time()
     print("Total time:" + (t2 - t1).__str__())
-    file = "./b_1_2_sf_k4_coor_freq_without_control.pk"
+    file = "./b_1_2_sf_k6_coor_freq_without_control.pk"
     if not os.path.exists(file):
         os.mknod(file)
-    with open('./b_1_2_sf_k4_coor_freq_without_control.pk', 'wb') as f:
+    with open('./b_1_2_sf_k6_coor_freq_without_control.pk', 'wb') as f:
         pickle.dump([b_list, coor_freq], f)
 
     ## -------------------draw the graph----------------------
