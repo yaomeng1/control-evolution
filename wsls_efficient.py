@@ -13,7 +13,7 @@ b_list = np.arange(1, 2, 0.1)
 graph_scale = 30
 nodesnum = graph_scale ** 2
 fd = 0.05  # fraction of driver nodes
-m = 3
+m = 2
 control_num = int(nodesnum * fd)
 
 
@@ -207,8 +207,8 @@ if __name__ == "__main__":
     pool.join()
     t2 = time.time()
     print("Total time:" + (t2 - t1).__str__())
-    file = "./fullgene_b_1_2_sf_k6_decentralized_controlrate_5_wsls.pk"
+    file = "./fullgene_b_1_2_sf_k4_decentralized_controlrate_5_wsls.pk"
     if not os.path.exists(file):
         os.mknod(file)
-    with open('./fullgene_b_1_2_sf_k6_decentralized_controlrate_5_wsls.pk', 'wb') as f:
+    with open('./fullgene_b_1_2_sf_k4_decentralized_controlrate_5_wsls.pk', 'wb') as f:
         pickle.dump([b_list, coor_freq], f)
