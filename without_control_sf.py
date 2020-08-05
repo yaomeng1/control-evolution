@@ -12,7 +12,7 @@ import time
 b_list = np.arange(1, 2, 0.1)
 graph_scale = 30
 nodesnum = graph_scale ** 2
-m = 3
+m = 2
 
 
 
@@ -141,10 +141,10 @@ if __name__ == "__main__":
     pool.join()
     t2 = time.time()
     print("Total time:" + (t2 - t1).__str__())
-    file = "./fullgene_b_1_2_sf_k6_coor_freq_without_control.pk"
+    file = "./fullgene_b_1_2_sf_k4_coor_freq_without_control.pk"
     if not os.path.exists(file):
         os.mknod(file)
-    with open('./fullgene_b_1_2_sf_k6_coor_freq_without_control.pk', 'wb') as f:
+    with open('./fullgene_b_1_2_sf_k4_coor_freq_without_control.pk', 'wb') as f:
         pickle.dump([b_list, coor_freq], f)
 
     ## -------------------draw the graph----------------------
