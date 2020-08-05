@@ -80,7 +80,8 @@ def evolution(state_array, payoff_dict, game_matrix, edge_list, adj_dict,
 
         freq_list.append(coord)
 
-    return np.mean(np.array(freq_list)[-2000:]).reshape(1, -1)
+    # return np.mean(np.array(freq_list)[-2000:]).reshape(1, -1)
+    return np.array(freq_list).reshape(1, -1)
 
 
 def process(b):
@@ -90,9 +91,9 @@ def process(b):
     game_matrix[1][0] = 0  # S
     game_matrix[1][1] = 1  # R
     net_list = []
-    net_rep = 10
-    control_rep = 10
-    repeat_time = 5
+    net_rep = 1
+    control_rep = 1
+    repeat_time = 1
 
     for _ in range(net_rep):
         control_list = []
@@ -130,10 +131,11 @@ def process(b):
 
                 repeat_list.append(evolution(state_array, payoff_dict, game_matrix, edge_list, adj_dict,
                                              control_bool_array, rest_nodes, control_nodes_list))
-            control_list.append(np.concatenate(repeat_list, axis=1))
-
-        net_list.append(np.concatenate(control_list, axis=0).reshape(1, control_rep, repeat_time))
-    return np.concatenate(net_list, axis=0)
+                return repeat_list[0]
+    #         control_list.append(np.concatenate(repeat_list, axis=1))
+    #
+    #     net_list.append(np.concatenate(control_list, axis=0).reshape(1, control_rep, repeat_time))
+    # return np.concatenate(net_list, axis=0)
 
 
 if __name__ == "__main__":
