@@ -9,13 +9,27 @@ from multiprocessing import Process, Manager
 import functools
 import time
 
-b_list = np.arange(1, 2, 0.1)
+b_list = np.arange(1, 1.22, 0.025)
 graph_scale = 30
 nodesnum = graph_scale ** 2
 fd = 0.05  # fraction of driver nodes
 m = 3
 control_num = int(nodesnum * fd)
 
+
+def central_controller(adj_dict, controlnum):
+    starter = random.choice(range(nodesnum))
+    control_nodelist = set([starter])
+    control_nodelist_former = set()
+
+    while len(control_nodelist) < controlnum:
+        for node in control_nodelist - control_nodelist_former:
+            control_nodelist_former = control_nodelist.copy()
+            control_nodelist.update(set(adj_dict[node]))
+            if len(control_nodelist) >= controlnum:
+                break
+    control_nodelist = list(control_nodelist)[:controlnum]
+    return control_nodelist
 
 def edge2num(node, scale):
     num = node[0] * scale + node[1]
@@ -115,30 +129,31 @@ def process(b):
     game_matrix[1][0] = 0  # S
     game_matrix[1][1] = 1  # R
     net_list = []
-    net_rep = 10
-    control_rep = 10
-    repeat_time = 5
+    net_rep = 1
+    control_rep = 20
+    repeat_time = 20
 
     for _ in range(net_rep):
         control_list = []
-        graph = nx.random_graphs.barabasi_albert_graph(nodesnum, m)
+        # graph = nx.random_graphs.barabasi_albert_graph(nodesnum, m)
         # graph = nx.random_graphs.random_regular_graph(2 * m, nodesnum)
-        # graph = nx.generators.lattice.grid_2d_graph(graph_scale, graph_scale, periodic=True)
+        graph = nx.generators.lattice.grid_2d_graph(graph_scale, graph_scale, periodic=True)
         edge_list_ini = [edge for edge in graph.edges()]
         adj_dict_ini = nx.to_dict_of_lists(graph)
 
-        ## lattice
-        # edge_list_ini = [(edge2num(edge[0], graph_scale), edge2num(edge[1], graph_scale)) for edge in edge_list_ini]
-        # adj_dict = {}
-        # for key, item in adj_dict_ini.items():
-        #     adj_dict[edge2num(key, graph_scale)] = [edge2num(node, graph_scale) for node in item]
-        # adj_dict_ini = adj_dict
+        # lattice
+        edge_list_ini = [(edge2num(edge[0], graph_scale), edge2num(edge[1], graph_scale)) for edge in edge_list_ini]
+        adj_dict = {}
+        for key, item in adj_dict_ini.items():
+            adj_dict[edge2num(key, graph_scale)] = [edge2num(node, graph_scale) for node in item]
+        adj_dict_ini = adj_dict
 
         for _ in range(control_rep):
             repeat_list = []
             all_nodes = list(range(nodesnum))
-            control_nodes_list = random.sample(all_nodes, int(nodesnum * fd))
-            control_nodes_list.sort()
+            # control_nodes_list = random.sample(all_nodes, int(nodesnum * fd))
+            # control_nodes_list.sort()
+            control_nodes_list = central_controller(adj_dict_ini, control_num)
             rest_nodes = set(all_nodes) - set(control_nodes_list)
 
             control_dict = dict(zip(control_nodes_list, range(control_num)))
@@ -202,8 +217,8 @@ if __name__ == "__main__":
     pool.join()
     t2 = time.time()
     print("Total time:" + (t2 - t1).__str__())
-    file = "./b_1_2_sf_k6_decentralized_controlrate_5_tit_tat.pk"
+    file = "./lattice_centralized_controlrate_5_tit_tat.pk"
     if not os.path.exists(file):
         os.mknod(file)
-    with open('./b_1_2_sf_k6_decentralized_controlrate_5_tit_tat.pk', 'wb') as f:
+    with open('./lattice_centralized_controlrate_5_tit_tat.pk', 'wb') as f:
         pickle.dump([b_list, coor_freq], f)
