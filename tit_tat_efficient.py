@@ -130,9 +130,9 @@ def process(b):
     game_matrix[1][0] = 0  # S
     game_matrix[1][1] = 1  # R
     net_list = []
-    net_rep = 1
-    control_rep = 20
-    repeat_time = 20
+    net_rep = 10
+    control_rep = 10
+    repeat_time = 5
 
     for _ in range(net_rep):
         control_list = []
