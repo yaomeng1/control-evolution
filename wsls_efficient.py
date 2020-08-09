@@ -13,9 +13,22 @@ b_list = np.arange(1, 2, 0.1)
 graph_scale = 30
 nodesnum = graph_scale ** 2
 fd = 0.05  # fraction of driver nodes
-m = 3
+m = 2
 control_num = int(nodesnum * fd)
 
+def central_controller(adj_dict, controlnum):
+    starter = random.choice(range(nodesnum))
+    control_nodelist = set([starter])
+    control_nodelist_former = set()
+
+    while len(control_nodelist) < controlnum:
+        new_add = control_nodelist - control_nodelist_former
+        control_nodelist_former = control_nodelist.copy()
+        for node in new_add:
+            control_nodelist.update(set(adj_dict[node]))
+
+    control_nodelist = list(control_nodelist)[:controlnum]
+    return control_nodelist
 
 def edge2num(node, scale):
     num = node[0] * scale + node[1]
@@ -119,9 +132,9 @@ def process(b):
     game_matrix[1][0] = 0  # S
     game_matrix[1][1] = 1  # R
     net_list = []
-    net_rep = 10
-    control_rep = 10
-    repeat_time = 5
+    net_rep = 1
+    control_rep = 1
+    repeat_time = 1
     for _ in range(net_rep):
         control_list = []
         graph = nx.random_graphs.barabasi_albert_graph(nodesnum, m)
@@ -139,8 +152,9 @@ def process(b):
         for _ in range(control_rep):
             repeat_list = []
             all_nodes = list(range(nodesnum))
-            control_nodes_list = random.sample(all_nodes, int(nodesnum * fd))
-            control_nodes_list.sort()
+            # control_nodes_list = random.sample(all_nodes, int(nodesnum * fd))
+            control_nodes_list = central_controller(adj_dict_ini, control_num)
+            control_nodes_list.sort()  # a must
             rest_nodes = set(all_nodes) - set(control_nodes_list)
 
             control_dict = dict(zip(control_nodes_list, range(control_num)))
@@ -204,8 +218,8 @@ if __name__ == "__main__":
     pool.join()
     t2 = time.time()
     print("Total time:" + (t2 - t1).__str__())
-    file = "./b_1_2_sf_k6_decentralized_controlrate_5_wsls.pk"
+    file = "./b_1_2_sf_k4_centralized_controlrate_5_wsls.pk"
     if not os.path.exists(file):
         os.mknod(file)
-    with open('./b_1_2_sf_k6_decentralized_controlrate_5_wsls.pk', 'wb') as f:
+    with open('./b_1_2_sf_k4_centralized_controlrate_5_wsls.pk', 'wb') as f:
         pickle.dump([b_list, coor_freq], f)

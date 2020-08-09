@@ -13,6 +13,22 @@ b_list = np.arange(1, 1.22, 0.025)
 graph_scale = 10
 nodesnum = graph_scale ** 2
 fd = 0.05  # fraction of driver nodes
+control_num = int(nodesnum * fd)
+
+
+def central_controller(adj_dict, controlnum):
+    starter = random.choice(range(nodesnum))
+    control_nodelist = set([starter])
+    control_nodelist_former = set()
+
+    while len(control_nodelist) < controlnum:
+        new_add = control_nodelist - control_nodelist_former
+        control_nodelist_former = control_nodelist.copy()
+        for node in new_add:
+            control_nodelist.update(set(adj_dict[node]))
+
+    control_nodelist = list(control_nodelist)[:controlnum]
+    return control_nodelist
 
 
 def edge2num(node, scale):
@@ -38,7 +54,6 @@ def single_round(state_array, payoff_dict, game_matrix, edge_list, control_nodes
         payoff_dict[nodey] += game_matrix[state_array[nodey]][state_array[nodex]]
 
 
-
 def replicate_dynamic(state_dict, payoff_dict, adj_dict, rest_nodes):
     """
     replicator dynamic after single round game
@@ -56,7 +71,6 @@ def replicate_dynamic(state_dict, payoff_dict, adj_dict, rest_nodes):
         prob = 1 / (1 + np.exp(10 * (payoff_dict[node] - payoff_dict[neighbor])))
         if rand_pick(prob):
             state_dict[node] = previous_state[neighbor]
-
 
 
 def clear(payoff_dict):
@@ -89,13 +103,14 @@ def process(b, edge_list, adj_dict):
     game_matrix[1][0] = 0  # S
     game_matrix[1][1] = 1  # R
     net_list = []
-    repeat_time = 50
-    net_rep = 10
+    repeat_time = 20
+    net_rep = 20
 
     for _ in range(net_rep):
         repeat_list = []
         all_nodes = list(range(nodesnum))
-        control_nodes_list = random.sample(all_nodes, int(nodesnum * fd))
+        # control_nodes_list = random.sample(all_nodes, int(nodesnum * fd))
+        control_nodes_list = central_controller(adj_dict_ini, control_num)
         # rest nodes select half
         rest_nodes = set(all_nodes) - set(control_nodes_list)
         ## centralized

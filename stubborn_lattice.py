@@ -21,10 +21,11 @@ def central_controller(adj_dict, controlnum):
     control_nodelist_former = set()
 
     while len(control_nodelist) < controlnum:
-        for node in control_nodelist - control_nodelist_former:
+        new_add = control_nodelist - control_nodelist_former
+        control_nodelist_former = control_nodelist.copy()
+        for node in new_add:
             control_nodelist.update(set(adj_dict[node]))
-            if len(control_nodelist) >= controlnum:
-                break
+
     control_nodelist = list(control_nodelist)[:controlnum]
     return control_nodelist
 
@@ -104,8 +105,9 @@ def process(b, edge_list, adj_dict):
     for _ in range(net_rep):
         repeat_list = []
         all_nodes = list(range(nodesnum))
-        control_nodes_list = random.sample(all_nodes, int(nodesnum * fd))
+        # control_nodes_list = random.sample(all_nodes, int(nodesnum * fd))
         # rest nodes select half
+        control_nodes_list = central_controller(adj_dict_ini, control_num)
         rest_nodes = set(all_nodes) - set(control_nodes_list)
         ## centralized
 

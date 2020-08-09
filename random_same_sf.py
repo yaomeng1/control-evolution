@@ -13,8 +13,24 @@ b_list = np.arange(1, 2, 0.1)
 graph_scale = 30
 nodesnum = graph_scale ** 2
 fd = 0.05  # fraction of driver nodes
-m = 3
+m = 2
 control_num = int(nodesnum * fd)
+
+
+def central_controller(adj_dict, controlnum):
+    starter = random.choice(range(nodesnum))
+    control_nodelist = set([starter])
+    control_nodelist_former = set()
+
+    while len(control_nodelist) < controlnum:
+        new_add = control_nodelist - control_nodelist_former
+        control_nodelist_former = control_nodelist.copy()
+        for node in new_add:
+            control_nodelist.update(set(adj_dict[node]))
+
+    control_nodelist = list(control_nodelist)[:controlnum]
+    return control_nodelist
+
 
 def edge2num(node, scale):
     num = node[0] * scale + node[1]
@@ -39,7 +55,6 @@ def single_round(state_array, payoff_dict, game_matrix, edge_list, control_nodes
         payoff_dict[nodey] += game_matrix[state_array[nodey]][state_array[nodex]]
 
 
-
 def replicate_dynamic(state_dict, payoff_dict, adj_dict, rest_nodes):
     """
     replicator dynamic after single round game
@@ -57,7 +72,6 @@ def replicate_dynamic(state_dict, payoff_dict, adj_dict, rest_nodes):
         prob = 1 / (1 + np.exp(10 * (payoff_dict[node] - payoff_dict[neighbor])))
         if rand_pick(prob):
             state_dict[node] = previous_state[neighbor]
-
 
 
 def clear(payoff_dict):
@@ -110,8 +124,9 @@ def process(b):
         for _ in range(control_rep):
             repeat_list = []
             all_nodes = list(range(nodesnum))
-            control_nodes_list = random.sample(all_nodes, int(nodesnum * fd))
+            # control_nodes_list = random.sample(all_nodes, int(nodesnum * fd))
             # rest nodes select half
+            control_nodes_list = central_controller(adj_dict, control_num)
             rest_nodes = set(all_nodes) - set(control_nodes_list)
             ## centralized
 
@@ -159,10 +174,10 @@ if __name__ == "__main__":
     pool.join()
     t2 = time.time()
     print("Total time:" + (t2 - t1).__str__())
-    file = "./b_1_2_sf_k6_decentralized_controlrate_5_random_same.pk"
+    file = "./b_1_2_sf_k4_decentralized_controlrate_5_random_same.pk"
     if not os.path.exists(file):
         os.mknod(file)
-    with open('./b_1_2_sf_k6_decentralized_controlrate_5_random_same.pk', 'wb') as f:
+    with open('./b_1_2_sf_k4_decentralized_controlrate_5_random_same.pk', 'wb') as f:
         pickle.dump([b_list, coor_freq], f)
 
     ## -------------------draw the graph----------------------
