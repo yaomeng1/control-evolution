@@ -16,19 +16,21 @@ fd = 0.05  # fraction of driver nodes
 m = 3
 control_num = int(nodesnum * fd)
 
-
 def central_controller(adj_dict, controlnum):
     starter = random.choice(range(nodesnum))
-    control_nodelist = set([starter])
-    control_nodelist_former = set()
-
+    control_nodelist = [starter]
+    print(control_nodelist)
+    control_nodelist_former = []
     while len(control_nodelist) < controlnum:
-        new_add = control_nodelist - control_nodelist_former
+        new_add = set(control_nodelist) - set(control_nodelist_former)
         control_nodelist_former = control_nodelist.copy()
         for node in new_add:
-            control_nodelist.update(set(adj_dict[node]))
-
-    control_nodelist = list(control_nodelist)[:controlnum]
+            control_nodelist.extend(
+                [neighbor for neighbor in adj_dict[node] if neighbor not in control_nodelist])
+        print(control_nodelist)
+    if len(control_nodelist) - controlnum > 0:
+        control_nodelist = control_nodelist[:controlnum]
+    # print(len(set(control_nodelist))==len(control_nodelist))
     return control_nodelist
 
 
@@ -206,7 +208,7 @@ if __name__ == "__main__":
     # adj_dict_ini = adj_dict
 
     ##----------------debug_test-----------------------------
-    # process(b=1.025, edge_list_ini=edge_list_ini, adj_dict_ini=adj_dict_ini)
+    # process(b=1.025)
 
     ##----------------parallel computation-------------------
     pool = multiprocessing.Pool()

@@ -18,16 +18,19 @@ control_num = int(nodesnum * fd)
 
 def central_controller(adj_dict, controlnum):
     starter = random.choice(range(nodesnum))
-    control_nodelist = set([starter])
-    control_nodelist_former = set()
-
+    control_nodelist = [starter]
+    print(control_nodelist)
+    control_nodelist_former = []
     while len(control_nodelist) < controlnum:
-        new_add = control_nodelist - control_nodelist_former
+        new_add = set(control_nodelist) - set(control_nodelist_former)
         control_nodelist_former = control_nodelist.copy()
         for node in new_add:
-            control_nodelist.update(set(adj_dict[node]))
-
-    control_nodelist = list(control_nodelist)[:controlnum]
+            control_nodelist.extend(
+                [neighbor for neighbor in adj_dict[node] if neighbor not in control_nodelist])
+        print(control_nodelist)
+    if len(control_nodelist) - controlnum > 0:
+        control_nodelist = control_nodelist[:controlnum]
+    # print(len(set(control_nodelist))==len(control_nodelist))
     return control_nodelist
 
 
