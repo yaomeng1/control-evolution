@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 ## k4
 #
-with open('./b_1_2_sf_decentralized_controlrate_5_stubborn.pk', 'rb') as f:
+with open('./b_1_2_sf_k4_centralized_controlrate_5_stubborn.pk', 'rb') as f:
     stubborn = pickle.load(f)
 
 with open('./b_1_2_sf_k4_centralized_controlrate_5_random_same.pk', 'rb') as f:
@@ -13,7 +13,7 @@ with open('./b_1_2_sf_k4_centralized_controlrate_5_random_same.pk', 'rb') as f:
 with open('./b_1_2_sf_k4_centralized_controlrate_5_wsls.pk', 'rb') as f:
     wsls = pickle.load(f)
 
-with open('./b_1_2_sf_decentralized_controlrate_5_tit_tat.pk', 'rb') as f:
+with open('./b_1_2_sf_k4_centralized_controlrate_5_tit_tat.pk', 'rb') as f:
     tit = pickle.load(f)
 with open('./b_1_2_sf_coor_freq_without_control.pk', 'rb') as f:
     nocontrol = pickle.load(f)
